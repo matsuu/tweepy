@@ -75,7 +75,7 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
 
     # If an error was returned, throw an exception
     if resp.status != 200:
-      raise TweepError(parse_error(resp.read()))
+      raise TweepError(parse_error(resp.read().decode()))
 
     # Pass returned body into parser and return parser output
     out =  parser(resp.read().decode(), api)
