@@ -17,7 +17,7 @@ class BasicAuthHandler(AuthHandler):
     self._b64up = base64.b64encode(bytes('%s:%s' % (username, password), 'ascii'))
 
   def apply_auth(self, url, method, headers, parameters):
-    headers['Authorization'] = 'Basic %s' % self._b64up
+    headers['Authorization'] = 'Basic %s' % self._b64up.decode()
 
 """OAuth authentication handler"""
 class OAuthHandler(AuthHandler):
