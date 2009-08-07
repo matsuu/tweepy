@@ -78,7 +78,7 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
       raise TweepError(parse_error(resp.read()))
 
     # Pass returned body into parser and return parser output
-    out =  parser(resp.read(), api)
+    out =  parser(resp.read().decode(), api)
 
     # store result in cache
     if api.cache and method == 'GET':
