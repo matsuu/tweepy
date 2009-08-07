@@ -33,7 +33,7 @@ def _parse_user(obj, api):
 
   user = api.classes['user']()
   user._api = api
-  for k,v in obj.items():
+  for k,v in list(obj.items()):
     if k == 'created_at':
       setattr(user, k, _parse_datetime(v))
     elif k == 'status':
@@ -57,7 +57,7 @@ def _parse_status(obj, api):
 
   status = api.classes['status']()
   status._api = api
-  for k,v in obj.items():
+  for k,v in list(obj.items()):
     if k == 'user':
       setattr(status, k, _parse_user(v, api))
     elif k == 'created_at':
@@ -84,7 +84,7 @@ def _parse_dm(obj, api):
 
   dm = api.classes['direct_message']()
   dm._api = api
-  for k,v in obj.items():
+  for k,v in list(obj.items()):
     if k == 'sender':
       setattr(dm, k, _parse_user(v, api))
     elif k == 'created_at':
@@ -110,12 +110,12 @@ def parse_friendship(data, api):
 
   # parse source
   source = api.classes['friendship']()
-  for k,v in relationship['source'].items():
+  for k,v in list(relationship['source'].items()):
     setattr(source, k, v)
 
   # parse target
   target = api.classes['friendship']()
-  for k,v in relationship['target'].items():
+  for k,v in list(relationship['target'].items()):
     setattr(target, k, v)
 
   return source, target
@@ -124,7 +124,7 @@ def _parse_saved_search(obj, api):
 
   ss = api.classes['saved_search']()
   ss._api = api
-  for k,v in obj.items():
+  for k,v in list(obj.items()):
     if k == 'created_at':
       setattr(ss, k, _parse_datetime(v))
     else:
@@ -146,7 +146,7 @@ def parse_saved_searches(data, api):
 def _parse_search_result(obj, api):
 
   result = api.classes['search_result']()
-  for k,v in obj.items():
+  for k,v in list(obj.items()):
     if k == 'created_at':
       setattr(result, k, _parse_search_datetime(v))
     else:

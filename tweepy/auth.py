@@ -1,13 +1,9 @@
-# Tweepy
-# Copyright 2009 Joshua Roesslein
-# See LICENSE
-
-from urllib2 import Request, urlopen
-from urllib import quote
+from urllib.request import Request, urlopen
+from urllib.parse import quote
 import base64
 
-import oauth
-from error import TweepError
+from . import oauth
+from .error import TweepError
 
 class AuthHandler(object):
 
@@ -52,7 +48,7 @@ class OAuthHandler(AuthHandler):
       resp = urlopen(Request(self.REQUEST_TOKEN_URL, headers=request.to_header()))
       return oauth.OAuthToken.from_string(resp.read())
 
-    except Exception, e:
+    except Exception as e:
       raise TweepError(e)
 
   def get_authorization_url(self):
@@ -66,7 +62,7 @@ class OAuthHandler(AuthHandler):
           token=self.request_token, http_url=self.AUTHORIZATION_URL)
       return request.to_url()
 
-    except Exception, e:
+    except Exception as e:
       raise TweepError(e)
 
   def get_access_token(self, verifier):
@@ -81,7 +77,7 @@ class OAuthHandler(AuthHandler):
       # send request
       resp = urlopen(Request(self.ACCESS_TOKEN_URL, headers=request.to_header()))
       self.access_token = oauth.OAuthToken.from_string(resp.read())
-    except Exception, e:
+    except Exception as e:
       raise TweepError(e)
       
 

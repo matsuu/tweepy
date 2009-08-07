@@ -1,6 +1,6 @@
 import tweepy
 
-print 'An example of using the Tweepy library...'
+print('An example of using the Tweepy library...')
 
 # We need an authentication handler to tell twitter who we are.
 # First let's make one using basic auth.
@@ -16,13 +16,13 @@ api = tweepy.API(basic_auth)
 # and print the texts to the console.
 public_timeline = api.public_timeline()
 for status in public_timeline:
-  print '%s:  %s\n   from %s posted at %s' % (
-      status.user.screen_name, status.text, status.source, status.created_at)
+  print('%s:  %s\n   from %s posted at %s' % (
+      status.user.screen_name, status.text, status.source, status.created_at))
 
 # Now we will update our twitter status
 # and print the text to the console.
 update = api.update_status(status='hello!')
-print 'Update: %s' % update.text
+print('Update: %s' % update.text)
 
 # Get the timeline for the 'twitter' user.
 twitter_timeline = api.user_timeline(screen_name='twitter')

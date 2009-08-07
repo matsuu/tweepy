@@ -2,11 +2,11 @@
 # Copyright 2009 Joshua Roesslein
 # See LICENSE
 
-import httplib
-import urllib
+import http.client
+import urllib.request, urllib.parse, urllib.error
 
-from parsers import parse_error
-from error import TweepError
+from .parsers import parse_error
+from .error import TweepError
 
 def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
               timeout=None, host=None):
@@ -24,7 +24,7 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
           parameters[allowed_param[idx]] = arg
         except IndexError:
           raise TweepError('Too many parameters supplied!')
-      for k, arg in kargs.items():
+      for k, arg in list(kargs.items()):
         if k in parameters:
           raise TweepError('Multiple values for parameter %s supplied!' % k)
         parameters[k] = arg
@@ -38,7 +38,7 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
 
     # Build url with parameters
     if parameters:
-      url = '%s?%s' % (api.api_root + path, urllib.urlencode(parameters))
+      url = '%s?%s' % (api.api_root + path, urllib.parse.urlencode(parameters))
     else:
       url = api.api_root + path
 
@@ -63,9 +63,9 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
 
     # Open connection
     if api.secure:
-      conn = httplib.HTTPSConnection(_host, timeout=10)
+      conn = http.client.HTTPSConnection(_host, timeout=10)
     else:
-      conn = httplib.HTTPConnection(_host, timeout=10)
+      conn = http.client.HTTPConnection(_host, timeout=10)
 
     # Build request
     conn.request(method, url, headers=headers)

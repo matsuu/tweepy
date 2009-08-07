@@ -7,7 +7,7 @@ class Model(object):
   def __getstate__(self):
     # pickle
     pickle = {}
-    for k,v in self.__dict__.items():
+    for k,v in list(self.__dict__.items()):
       if k == '_api': continue # do not pickle the api reference
       pickle[k] = v
     return pickle
