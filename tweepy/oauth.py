@@ -152,7 +152,7 @@ class OAuthRequest(object):
     def get_nonoauth_parameters(self):
         """Get any non-OAuth parameters."""
         parameters = {}
-        for k, v in self.parameters.items():
+        for k, v in list(self.parameters.items()):
             # Ignore oauth parameters.
             if k.find('oauth_') < 0:
                 parameters[k] = v
@@ -163,7 +163,7 @@ class OAuthRequest(object):
         auth_header = 'OAuth realm="%s"' % realm
         # Add the oauth parameters.
         if self.parameters:
-            for k, v in self.parameters.items():
+            for k, v in list(self.parameters.items()):
                 if k[:6] == 'oauth_':
                     auth_header += ', %s="%s"' % (k, escape(str(v)))
         return {'Authorization': auth_header}
@@ -171,7 +171,7 @@ class OAuthRequest(object):
     def to_postdata(self):
         """Serialize as post data for a POST request."""
         return '&'.join(['%s=%s' % (escape(str(k)), escape(str(v))) \
-            for k, v in self.parameters.items()])
+            for k, v in list(self.parameters.items())])
 
     def to_url(self):
         """Serialize as a URL for a GET request."""
@@ -311,7 +311,7 @@ class OAuthRequest(object):
     def _split_url_string(param_str):
         """Turn URL string into parameters."""
         parameters = cgi.parse_qs(param_str, keep_blank_values=False)
-        for k, v in parameters.items():
+        for k, v in list(parameters.items()):
             parameters[k] = urllib.parse.unquote(v[0])
         return parameters
     _split_url_string = staticmethod(_split_url_string)

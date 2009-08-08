@@ -2,7 +2,7 @@
 # Copyright 2009 Joshua Roesslein
 # See LICENSE
 
-import httplib
+import http.client
 from socket import timeout
 from threading import Thread
 from time import sleep
@@ -46,7 +46,7 @@ class Stream(object):
         # quit if error count greater than retry count
         break
       try:
-        conn = httplib.HTTPConnection(self.host, timeout=self.timeout)
+        conn = http.client.HTTPConnection(self.host, timeout=self.timeout)
         conn.request('POST', self.url, headers=headers)
         resp = conn.getresponse()
         if resp.status != 200:

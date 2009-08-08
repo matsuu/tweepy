@@ -13,7 +13,7 @@ api instance to let twitter know who we are.
 
 First let's try creating a basic auth handler.
 """
-username = raw_input('Twitter username: ')
+username = input('Twitter username: ')
 password = getpass('Twitter password: ')
 basic_auth = tweepy.BasicAuthHandler(username, password)
 
@@ -36,7 +36,7 @@ To do this you will ask the OAuthHandler for the authorization URL
 which you will then display to the user OR open their browser to that URL.
 For this example we will just print the URL to the console.
 """
-print 'Please authorize us: %s' % oauth_auth.get_authorization_url()
+print('Please authorize us: %s' % oauth_auth.get_authorization_url())
 
 """
 Now that we have been authorized, we must fetch the access token.
@@ -44,7 +44,7 @@ To do this the user must either supply us with a PIN OR if we are using a callba
 we must wait for that and grab the verifier number from the request.
 For this example we will ask the user for the PIN.
 """
-verifier = raw_input('PIN: ').strip()
+verifier = input('PIN: ').strip()
 oauth_auth.get_access_token(verifier)
 
 """
@@ -52,7 +52,7 @@ Okay we are all set then with OAuth. If you want to store the access
 token for later use, here's how...
 """
 access_token_to_store = oauth_auth.access_token
-print 'Access token: %s' % access_token_to_store
+print('Access token: %s' % access_token_to_store)
 
 """
 And to re-create the OAuthHandler with that access token later on...
