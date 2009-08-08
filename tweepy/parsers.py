@@ -4,10 +4,24 @@
 
 from datetime import datetime
 
+from models import models
+
 try:
   import json
 except ImportError:
   import simplejson as json
+
+def parse_json(data, api):
+
+  return json.loads(data)
+
+def parse_return_true(data, api):
+
+  return True
+
+def parse_none(data, api):
+
+  return None
 
 def parse_error(data):
 
@@ -31,7 +45,7 @@ def _parse_a_href(atag):
 
 def _parse_user(obj, api):
 
-  user = api.classes['user']()
+  user = models['user']()
   user._api = api
   for k,v in list(obj.items()):
     if k == 'created_at':
@@ -55,7 +69,7 @@ def parse_users(data, api):
 
 def _parse_status(obj, api):
 
-  status = api.classes['status']()
+  status = models['status']()
   status._api = api
   for k,v in list(obj.items()):
     if k == 'user':
@@ -82,7 +96,7 @@ def parse_statuses(data, api):
 
 def _parse_dm(obj, api):
 
-  dm = api.classes['direct_message']()
+  dm = models['direct_message']()
   dm._api = api
   for k,v in list(obj.items()):
     if k == 'sender' or k == 'recipient':
@@ -109,12 +123,12 @@ def parse_friendship(data, api):
   relationship = json.loads(data)['relationship']
 
   # parse source
-  source = api.classes['friendship']()
+  source = models['friendship']()
   for k,v in list(relationship['source'].items()):
     setattr(source, k, v)
 
   # parse target
-  target = api.classes['friendship']()
+  target = models['friendship']()
   for k,v in list(relationship['target'].items()):
     setattr(target, k, v)
 
@@ -122,7 +136,7 @@ def parse_friendship(data, api):
 
 def _parse_saved_search(obj, api):
 
-  ss = api.classes['saved_search']()
+  ss = models['saved_search']()
   ss._api = api
   for k,v in list(obj.items()):
     if k == 'created_at':
@@ -138,14 +152,14 @@ def parse_saved_search(data, api):
 def parse_saved_searches(data, api):
 
   saved_searches = []
-  saved_search = api.classes['saved_search']()
+  saved_search = models['saved_search']()
   for obj in json.loads(data):
     saved_searches.append(_parse_saved_search(obj, api))
   return saved_searches
 
 def _parse_search_result(obj, api):
 
-  result = api.classes['search_result']()
+  result = models['search_result']()
   for k,v in list(obj.items()):
     if k == 'created_at':
       setattr(result, k, _parse_search_datetime(v))
@@ -161,14 +175,8 @@ def parse_search_results(data, api):
     result_objects.append(_parse_search_result(obj, api))
   return result_objects
 
-def parse_json(data, api):
+def parse_trend_results(data, api):
 
-  return json.loads(data)
+  return json.loads(data)['trends']
+  
 
-def parse_return_true(data, api):
-
-  return True
-
-def parse_none(data, api):
-
-  return None

@@ -11,16 +11,14 @@ from .error import TweepError
 class API(object):
 
   def __init__(self, auth_handler=None, username=None, host='twitter.com', cache=None,
-                secure=False, api_root='', classes={'user': User, 'status': Status,
-                'direct_message': DirectMessage, 'friendship': Friendship,
-                'saved_search': SavedSearch, 'search_result': SearchResult}):
+                secure=False, api_root='', validate=True):
     self.auth_handler = auth_handler
     self.username = username
     self.host = host
     self.api_root = api_root
     self.cache = cache
     self.secure = secure
-    self.classes = classes
+    self.validate = validate
 
   """Get public timeline"""
   public_timeline = bind_api(
@@ -373,4 +371,11 @@ class API(object):
         parser = parse_search_results,
         allowed_param = ['q', 'lang', 'rpp', 'page', 'since_id', 'geocode', 'show_user'],
     )(self, *args, **kargs)
+
+  def trends(self):
+    return bind_api(
+        host = 'search.' + self.host,
+        path = '/trends.json',
+        parser = parse_trend_results
+    )(self)
 
