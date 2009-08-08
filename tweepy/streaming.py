@@ -78,7 +78,7 @@ class Stream(object):
       # read length
       length = ''
       while True:
-        c = resp.read(1)
+        c = resp.read(1).decode()
         if c == '\n':
           break
         length += c
@@ -89,7 +89,7 @@ class Stream(object):
         continue
 
       # read data
-      data = resp.read(length)
+      data = resp.read(length).decode()
 
       # turn json data into status object
       if 'in_reply_to_status_id' in data:
