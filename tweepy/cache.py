@@ -7,9 +7,9 @@ import threading
 import os
 import hashlib
 import fcntl
-import cPickle as pickle
+import pickle as pickle
 
-from error import TweepError
+from .error import TweepError
 
 """Cache interface"""
 class Cache(object):
@@ -117,7 +117,7 @@ class FileCache(Cache):
 
   def _get_path(self, key):
     md5 = hashlib.md5()
-    md5.update(key)
+    md5.update(key.encode('ascii'))
     return os.path.join(self.cache_dir, md5.hexdigest())
 
   def _lock_file(self, path, exclusive=True):
