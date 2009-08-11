@@ -98,6 +98,24 @@ class TweepyAPITests(unittest.TestCase):
     self.assert_(isinstance(source, Friendship))
     self.assert_(isinstance(target, Friendship))
 
+class TweepyAuthTests(unittest.TestCase):
+
+  consumer_key = 'ZbzSsdQj7t68VYlqIFvdcA'
+  consumer_secret = '4yDWgrBiRs2WIx3bfvF9UWCRmtQ2YKpKJKBahtZcU'
+
+  def testoauth(self):
+    auth = OAuthHandler(self.consumer_key, self.consumer_secret)   
+    auth_url = auth.get_authorization_url()
+    self.assert_(auth_url.startswith('http://twitter.com/oauth/authorize?'))
+    print 'Please authorize: ' + auth_url
+    verifier = raw_input('PIN: ').strip()
+    self.assert_(len(verifier) > 0)
+    access_token = auth.get_access_token(verifier)
+    self.assert_(access_token is not None)
+
+    api = API(auth)
+    self.assertTrue(api.verify_credentials())
+
 if __name__ == '__main__':
   unittest.main()
     
