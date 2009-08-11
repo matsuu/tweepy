@@ -107,8 +107,8 @@ class TweepyAuthTests(unittest.TestCase):
     auth = OAuthHandler(self.consumer_key, self.consumer_secret)   
     auth_url = auth.get_authorization_url()
     self.assert_(auth_url.startswith('http://twitter.com/oauth/authorize?'))
-    print 'Please authorize: ' + auth_url
-    verifier = raw_input('PIN: ').strip()
+    print('Please authorize: ' + auth_url)
+    verifier = input('PIN: ').strip()
     self.assert_(len(verifier) > 0)
     access_token = auth.get_access_token(verifier)
     self.assert_(access_token is not None)
