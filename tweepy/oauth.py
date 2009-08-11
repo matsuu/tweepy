@@ -565,12 +565,8 @@ class OAuthSignatureMethod_HMAC_SHA1(OAuthSignatureMethod):
             token)
 
         # HMAC object.
-        try:
-            import hashlib # 2.5
-            hashed = hmac.new(key, raw, hashlib.sha1)
-        except:
-            import sha # Deprecated
-            hashed = hmac.new(key, raw, sha)
+        import hashlib
+        hashed = hmac.new(key.encode(), raw.encode(), hashlib.sha1)
 
         # Calculate the digest base 64.
         return binascii.b2a_base64(hashed.digest())[:-1]

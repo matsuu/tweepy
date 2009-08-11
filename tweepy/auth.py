@@ -45,7 +45,8 @@ class OAuthHandler(AuthHandler):
       if self.callback:
         request.set_parameter('oauth_callback', self.callback)
       request.sign_request(self._sigmethod, self._consumer, None)
-      resp = urlopen(Request(self.REQUEST_TOKEN_URL, headers=request.to_header()))
+      resp = urlopen(Request(self.REQUEST_TOKEN_URL,
+          headers=request.to_header()), timeout=5.0)
       return oauth.OAuthToken.from_string(resp.read())
 
     except Exception as e:

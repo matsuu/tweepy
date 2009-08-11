@@ -1,5 +1,5 @@
 from getpass import getpass
-import cPickle as pickle
+import pickle as pickle
 import tweepy
 
 """ Tutorial 1 -- Authentication
