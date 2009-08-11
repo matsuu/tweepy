@@ -77,6 +77,8 @@ class OAuthHandler(AuthHandler):
       # send request
       resp = urlopen(Request(self.ACCESS_TOKEN_URL, headers=request.to_header()))
       self.access_token = oauth.OAuthToken.from_string(resp.read())
+      return self.access_token
+
     except Exception as e:
       raise TweepError(e)
       

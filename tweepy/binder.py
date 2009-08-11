@@ -27,8 +27,12 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
       for k, arg in list(kargs.items()):
         if k in parameters:
           raise TweepError('Multiple values for parameter %s supplied!' % k)
+        if k not in allowed_param:
+          raise TweepError('Invalid parameter %s supplied!' % k)
         parameters[k] = arg
     else:
+      if len(args) > 0 or len(kargs) > 0:
+        raise TweepError('This method takes no parameters!')
       parameters = None
 
     # Assemble headers
@@ -63,9 +67,9 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
 
     # Open connection
     if api.secure:
-      conn = http.client.HTTPSConnection(_host, timeout=10)
+      conn = http.client.HTTPSConnection(_host)
     else:
-      conn = http.client.HTTPConnection(_host, timeout=10)
+      conn = http.client.HTTPConnection(_host)
 
     # Build request
     conn.request(method, url, headers=headers)
