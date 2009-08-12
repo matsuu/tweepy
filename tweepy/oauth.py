@@ -29,6 +29,7 @@ import random
 import urllib.parse
 import hmac
 import binascii
+import hashlib
 
 
 VERSION = '1.0' # Hi Blaine!
@@ -48,13 +49,6 @@ def build_authenticate_header(realm=''):
 def escape(s):
     """Escape a URL including any /."""
     return urllib.parse.quote(s, safe='~')
-
-def _utf8_str(s):
-    """Convert unicode to utf-8."""
-    if isinstance(s, str):
-        return s.encode("utf-8")
-    else:
-        return str(s)
 
 def generate_timestamp():
     """Get seconds since epoch (UTC)."""
@@ -186,7 +180,7 @@ class OAuthRequest(object):
         except:
             pass
         # Escape key values before sorting.
-        key_values = [(escape(_utf8_str(k)), escape(_utf8_str(v))) \
+        key_values = [(escape(k).encode('utf-8'), escape(str(v)).encode('utf-8')) \
             for k,v in list(params.items())]
         # Sort lexicographically, first after key, then after value.
         key_values.sort()
@@ -565,8 +559,7 @@ class OAuthSignatureMethod_HMAC_SHA1(OAuthSignatureMethod):
             token)
 
         # HMAC object.
-        import hashlib
-        hashed = hmac.new(key.encode(), raw.encode(), hashlib.sha1)
+        hashed = hmac.new(key.encode('utf-8'), raw.encode('utf-8'), hashlib.sha1)
 
         # Calculate the digest base 64.
         return binascii.b2a_base64(hashed.digest())[:-1]
