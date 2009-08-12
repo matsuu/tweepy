@@ -5,8 +5,8 @@ import base64
 from . import oauth
 from .error import TweepError
 
-import http.client
-http.client.HTTPConnection.debuglevel = 1
+#import http.client
+#http.client.HTTPConnection.debuglevel = 1
 
 class AuthHandler(object):
 
@@ -50,7 +50,7 @@ class OAuthHandler(AuthHandler):
       request.sign_request(self._sigmethod, self._consumer, None)
       resp = urlopen(Request(self.REQUEST_TOKEN_URL,
           headers=request.to_header()), timeout=5.0)
-      return oauth.OAuthToken.from_string(resp.read())
+      return oauth.OAuthToken.from_string(resp.read().decode())
 
     except Exception as e:
       raise TweepError(e)
@@ -83,7 +83,7 @@ class OAuthHandler(AuthHandler):
 
       # send request
       resp = urlopen(Request(self.ACCESS_TOKEN_URL, headers=request.to_header()))
-      self.access_token = oauth.OAuthToken.from_string(resp.read())
+      self.access_token = oauth.OAuthToken.from_string(resp.read().decode())
       return self.access_token
 
     except Exception as e:

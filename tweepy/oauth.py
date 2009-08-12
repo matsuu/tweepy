@@ -185,7 +185,7 @@ class OAuthRequest(object):
         # Sort lexicographically, first after key, then after value.
         key_values.sort()
         # Combine key value pairs into a string.
-        return '&'.join(['%s=%s' % (k, v) for k, v in key_values])
+        return '&'.join(['%s=%s' % (k.decode(), v.decode()) for k, v in key_values])
 
     def get_normalized_http_method(self):
         """Uppercases the http method."""
@@ -562,7 +562,7 @@ class OAuthSignatureMethod_HMAC_SHA1(OAuthSignatureMethod):
         hashed = hmac.new(key.encode('utf-8'), raw.encode('utf-8'), hashlib.sha1)
 
         # Calculate the digest base 64.
-        return binascii.b2a_base64(hashed.digest())[:-1]
+        return binascii.b2a_base64(hashed.digest())[:-1].decode()
 
 
 class OAuthSignatureMethod_PLAINTEXT(OAuthSignatureMethod):
