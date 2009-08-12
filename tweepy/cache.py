@@ -2,8 +2,6 @@
 # Copyright 2009 Joshua Roesslein
 # See LICENSE
 
-from __future__ import with_statement  # need this for py2.5
-
 import time
 import threading
 import os

@@ -5,6 +5,9 @@ import base64
 from . import oauth
 from .error import TweepError
 
+import http.client
+http.client.HTTPConnection.debuglevel = 1
+
 class AuthHandler(object):
 
   def apply_auth(self, url, method, headers, parameters):
