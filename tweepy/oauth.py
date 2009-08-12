@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import cgi
 import urllib.request, urllib.parse, urllib.error
 import time
 import random
@@ -97,7 +96,7 @@ class OAuthToken(object):
         """ Returns a token from something like:
         oauth_token_secret=xxx&oauth_token=xxx
         """
-        params = cgi.parse_qs(s, keep_blank_values=False)
+        params = urllib.parse.parse_qs(s, keep_blank_values=False)
         key = params['oauth_token'][0]
         secret = params['oauth_token_secret'][0]
         return OAuthToken(key, secret)
@@ -304,7 +303,7 @@ class OAuthRequest(object):
 
     def _split_url_string(param_str):
         """Turn URL string into parameters."""
-        parameters = cgi.parse_qs(param_str, keep_blank_values=False)
+        parameters = urllib.parse.parse_qs(param_str, keep_blank_values=False)
         for k, v in list(parameters.items()):
             parameters[k] = urllib.parse.unquote(v[0])
         return parameters
