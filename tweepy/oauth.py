@@ -76,7 +76,7 @@ class OAuthConsumer(object):
         self.key = key
         self.secret = secret
 
-   
+
 class OAuthToken(object):
     """OAuthToken is a data type that represents an End User via either an access
     or request token.
@@ -477,6 +477,9 @@ class OAuthServer(object):
         if not token:
             raise OAuthError('Invalid %s token: %s' % (token_type, token_field))
         return token
+    
+    def _get_verifier(self, oauth_request):
+        return oauth_request.get_parameter('oauth_verifier')
 
     def _check_signature(self, oauth_request, consumer, token):
         timestamp, nonce = oauth_request._get_timestamp_nonce()
