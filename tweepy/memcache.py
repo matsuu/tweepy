@@ -191,7 +191,7 @@ class Client(local):
             data.append(( name, serverData ))
             readline = s.readline
             while 1:
-                line = readline()
+                line = readline().decode()
                 if not line or line.strip() == 'END': break
                 stats = line.split(' ', 2)
                 serverData[stats[1]] = stats[2]
@@ -212,7 +212,7 @@ class Client(local):
             readline = s.readline
             while 1:
                 line = readline()
-                if not line or line.strip() == 'END': break
+                if not line or line.strip() == b'END': break
                 item = line.split(' ', 2)
                 #0 = STAT, 1 = ITEM, 2 = Value
                 slab = item[1].split(':', 2)
@@ -601,7 +601,7 @@ class Client(local):
             try:
                 for key in keys:
                     line = server.readline()
-                    if line == 'STORED':
+                    if line == b'STORED':
                         continue
                     else:
                         notstored.append(prefixed_to_orig_key[key]) #un-mangle.
@@ -615,8 +615,10 @@ class Client(local):
            Transform val to a storable representation, returning a tuple of the flags, the length of the new value, and the new value itself.
         """
         flags = 0
-        if isinstance(val, str):
+        if isinstance(val, bytes):
             pass
+        elif isinstance(val, str):
+            val = val.encode('ascii')
         elif isinstance(val, int):
             flags |= Client._FLAG_INTEGER
             val = "%d" % val
@@ -631,9 +633,9 @@ class Client(local):
                 pickler = self.pickler(file, self.pickleProtocol)
             if self.persistent_id:
                 pickler.persistent_id = self.persistent_id
-            print(type(val))
-            pickler.dump(val)
-            val = file.getvalue()
+            #pickler.dump(val)
+            #val = file.getvalue()
+            val = pickle.dumps(val)
 
         lv = len(val)
         # We should try to compress if min_compress_len > 0 and we could
@@ -662,10 +664,11 @@ class Client(local):
         store_info = self._val_to_store_info(val, min_compress_len)
         if not store_info: return(0)
 
-        fullcmd = "%s %s %d %d %d\r\n%s" % (cmd, key, store_info[0], time, store_info[1], store_info[2])
+        fullcmd = "%s %s %d %d %d\r\n" % (cmd, key, store_info[0], time, store_info[1])
+        fullcmd = fullcmd.encode('ascii') + store_info[2]
         try:
             server.send_cmd(fullcmd)
-            return(server.expect("STORED") == "STORED")
+            return(server.expect(b"STORED") == b"STORED")
         except socket.error as msg:
             if type(msg) is tuple: msg = msg[1]
             server.mark_dead(msg)
@@ -689,7 +692,7 @@ class Client(local):
             if not rkey:
                 return None
             value = self._recv_value(server, flags, rlen)
-            server.expect("END")
+            server.expect(b"END")
         except (_Error, socket.error) as msg:
             if type(msg) is tuple: msg = msg[1]
             server.mark_dead(msg)
@@ -756,7 +759,7 @@ class Client(local):
         for server in server_keys.keys():
             try:
                 line = server.readline()
-                while line and line != 'END':
+                while line and line != b'END':
                     rkey, flags, rlen = self._expectvalue(server, line)
                     #  Bo Yang reports that this can sometimes be None
                     if rkey is not None:
@@ -772,7 +775,7 @@ class Client(local):
         if not line:
             line = server.readline()
 
-        if line[:5] == 'VALUE':
+        if line[:5] == b'VALUE':
             resp, rkey, flags, len = line.split()
             flags = int(flags)
             rlen = int(len)
@@ -800,11 +803,12 @@ class Client(local):
             val = int(buf)
         elif flags & Client._FLAG_PICKLE:
             try:
-                file = StringIO(buf)
+                """file = StringIO(buf)
                 unpickler = self.unpickler(file)
                 if self.persistent_load:
                     unpickler.persistent_load = self.persistent_load
-                val = unpickler.load()
+                val = unpickler.load()"""
+                val = pickle.loads(buf)
             except Exception as e:
                 self.debuglog('Pickle error: %s\n' % e)
                 val = None
@@ -850,7 +854,7 @@ class _Host:
         self.deaduntil = 0
         self.socket = None
 
-        self.buffer = ''
+        self.buffer = b''
 
     def _check_dead(self):
         if self.deaduntil and self.deaduntil > time.time():
@@ -885,7 +889,7 @@ class _Host:
             self.mark_dead("connect: %s" % msg[1])
             return None
         self.socket = s
-        self.buffer = ''
+        self.buffer = b''
         return s
 
     def close_socket(self):
@@ -894,7 +898,9 @@ class _Host:
             self.socket = None
 
     def send_cmd(self, cmd):
-        self.socket.sendall(cmd + '\r\n')
+        if isinstance(cmd, str):
+            cmd = cmd.encode('ascii')
+        self.socket.sendall(cmd + b'\r\n')
 
     def send_cmds(self, cmds):
         """ cmds already has trailing \r\n's applied """
@@ -904,7 +910,7 @@ class _Host:
         buf = self.buffer
         recv = self.socket.recv
         while True:
-            index = buf.find('\r\n')
+            index = buf.find(b'\r\n')
             if index >= 0:
                 break
             data = recv(4096)
@@ -917,7 +923,7 @@ class _Host:
             self.buffer = buf[index+2:]
             buf = buf[:index]
         else:
-            self.buffer = ''
+            self.buffer = b''
         return buf
 
     def expect(self, text):
@@ -983,8 +989,8 @@ def _doctest():
     return doctest.testmod(memcache, globs=globs)
 
 if __name__ == "__main__":
-    print("Testing docstrings...")
-    _doctest()
+    #print("Testing docstrings...")
+    #_doctest()
     print("Running tests:")
     print()
     serverList = [["127.0.0.1:11211"]]
