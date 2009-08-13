@@ -35,6 +35,10 @@ class Cache(object):
     """
     raise NotImplementedError
 
+  def count(self):
+    """Get count of entries currently stored in cache"""
+    raise NotImplementedError
+
   def cleanup(self):
     """Delete any expired entries in cache."""
     raise NotImplementedError
@@ -88,6 +92,9 @@ class MemoryCache(Cache):
 
       # entry found and not expired, return it
       return entry[1]
+
+  def count(self):
+    return len(self._entries)
 
   def cleanup(self):
     with self.lock:
@@ -182,6 +189,13 @@ class FileCache(Cache):
       f_lock.close()
       return value
 
+  def count(self):
+    c = 0
+    for entry in os.listdir(self.cache_dir):
+      if entry.endswith('.lock'): continue
+      c += 1
+    return c
+
   def cleanup(self):
     for entry in os.listdir(self.cache_dir):
       if entry.endswith('.lock'): continue
@@ -217,8 +231,14 @@ class MemCache(Cache):
 
     return value
 
+  def count(self):
+    count = 0
+    for sid, stats in self.client.get_stats():
+      count += int(stats.get('curr_items', 0))
+    return count
+
   def cleanup(self):
-    # not implemented for this cache
+    # not implemented for this cache since server handles it
     return
 
   def flush(self):
