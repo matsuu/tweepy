@@ -86,6 +86,4 @@ class OAuthHandler(AuthHandler):
 
     except Exception as e:
       raise TweepError(e)
-      
-
 
