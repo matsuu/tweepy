@@ -427,7 +427,7 @@ def _pack_image(filename, max_size):
   try:
     if os.path.getsize(filename) > (max_size * 1024):
       raise TweepError('File is too big, must be less than 700kb.')
-  except os.error, e:
+  except os.error as e:
       raise TweepError('Unable to access file')
 
   # image must be gif, jpeg, or png
@@ -440,22 +440,22 @@ def _pack_image(filename, max_size):
 
   # build the mulitpart-formdata body
   fp = open(filename, 'rb')
-  BOUNDARY = 'Tw3ePy'
+  BOUNDARY = b'Tw3ePy'
   body = []
-  body.append('--' + BOUNDARY)
-  body.append('Content-Disposition: form-data; name="image"; filename="%s"' % filename)
-  body.append('Content-Type: %s' % file_type)
-  body.append('')
+  body.append(b'--' + BOUNDARY)
+  body.append(('Content-Disposition: form-data; name="image"; filename="%s"' % filename).encode())
+  body.append(('Content-Type: %s' % file_type).encode())
+  body.append(b'')
   body.append(fp.read())
-  body.append('--' + BOUNDARY + '--')
-  body.append('')
+  body.append(b'--' + BOUNDARY + b'--')
+  body.append(b'')
   fp.close()
-  body = '\r\n'.join(body)
+  body = b'\r\n'.join(body)
 
   # build headers
   headers = {
     'Content-Type': 'multipart/form-data; boundary=Tw3ePy',
-    'Content-Length': len(body)
+    'Content-Length': str(len(body))
   }
 
   return headers, body
