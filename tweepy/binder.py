@@ -16,6 +16,20 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
     if require_auth and not api.auth_handler:
       raise TweepError('Authentication required!')
 
+    # check for post_data parameter
+    if 'post_data' in kargs:
+      post_data = kargs['post_data']
+      del kargs['post_data']
+    else:
+      post_data = None
+
+    # check for headers
+    if 'headers' in kargs:
+      headers = dict(kargs['headers'])
+      del kargs['headers']
+    else:
+      headers = {}
+
     # build parameter dict
     if allowed_param:
       parameters = {}
@@ -34,11 +48,6 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
       if len(args) > 0 or len(kargs) > 0:
         raise TweepError('This method takes no parameters!')
       parameters = None
-
-    # Assemble headers
-    headers = {
-      'User-Agent': 'tweepy'
-    }
 
     # Build url with parameters
     if parameters:
@@ -72,12 +81,14 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
       conn = http.client.HTTPConnection(_host, timeout=10.0)
 
     # Build request
-    conn.request(method, url, headers=headers)
+    conn.request(method, url, headers=headers, body=post_data)
 
     # Get response
     resp = conn.getresponse()
 
     # If an error was returned, throw an exception
+    if resp.status == 500:
+      raise TweepError('Twitter server error!')
     if resp.status != 200:
       raise TweepError(parse_error(resp.read().decode()))
 

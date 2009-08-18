@@ -2,6 +2,9 @@
 # Copyright 2009 Joshua Roesslein
 # See LICENSE
 
+import os
+import mimetypes
+
 from .binder import bind_api
 from .parsers import *
 from .error import TweepError
@@ -242,7 +245,26 @@ class API(object):
       require_auth = True
   )
 
-  # TODO: add support for changing profile and background images
+  """Update profile image"""
+  def update_profile_image(self, filename):
+    headers, post_data = _pack_image(filename, 700)
+    bind_api(
+        path = '/account/update_profile_image.json',
+        method = 'POST',
+        parser = parse_none,
+        require_auth = True
+    )(self, post_data=post_data, headers=headers)
+
+  """Update profile background image"""
+  def update_profile_background_image(self, filename, *args, **kargs):
+    headers, post_data = _pack_image(filename, 800)
+    bind_api(
+        path = '/account/update_profile_background_image.json',
+        method = 'POST',
+        parser = parse_none,
+        allowed_param = ['tile'],
+        require_auth = True
+    )(self, post_data=post_data, headers=headers)
 
   """Update profile"""
   update_profile = bind_api(
@@ -398,4 +420,43 @@ class API(object):
         path = '/trends.json',
         parser = parse_trend_results
     )(self)
+
+def _pack_image(filename, max_size):
+  """Pack image from file into multipart-formdata post body"""
+  # image must be less than 700kb in size
+  try:
+    if os.path.getsize(filename) > (max_size * 1024):
+      raise TweepError('File is too big, must be less than 700kb.')
+  except os.error, e:
+      raise TweepError('Unable to access file')
+
+  # image must be gif, jpeg, or png
+  file_type = mimetypes.guess_type(filename)
+  if file_type is None:
+    raise TweepError('Could not determine file type')
+  file_type = file_type[0]
+  if file_type != 'image/gif' and file_type != 'image/jpeg' and file_type != 'image/png':
+    raise TweepError('Invalid file type for image: %s' % file_type)
+
+  # build the mulitpart-formdata body
+  fp = open(filename, 'rb')
+  BOUNDARY = 'Tw3ePy'
+  body = []
+  body.append('--' + BOUNDARY)
+  body.append('Content-Disposition: form-data; name="image"; filename="%s"' % filename)
+  body.append('Content-Type: %s' % file_type)
+  body.append('')
+  body.append(fp.read())
+  body.append('--' + BOUNDARY + '--')
+  body.append('')
+  fp.close()
+  body = '\r\n'.join(body)
+
+  # build headers
+  headers = {
+    'Content-Type': 'multipart/form-data; boundary=Tw3ePy',
+    'Content-Length': len(body)
+  }
+
+  return headers, body
 
