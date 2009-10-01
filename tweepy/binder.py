@@ -73,8 +73,6 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
 
         # Build url with parameters
         if parameters:
-            for k,v in parameters.iteritems():
-                parameters[k] = v.encode('utf-8')
             url = '%s?%s' % (api.api_root + path, urllib.urlencode(parameters))
         else:
             url = api.api_root + path
