@@ -64,7 +64,7 @@ def bind_api(path, parser, allowed_param=None, method='GET', require_auth=False,
                     raise TweepError('Multiple values for parameter %s supplied!' % k)
                 if k not in allowed_param:
                     raise TweepError('Invalid parameter %s supplied!' % k)
-                parameters[k] = arg
+                parameters[k] = arg.encode('utf-8')
         else:
             if len(args) > 0 or len(kargs) > 0:
                 raise TweepError('This method takes no parameters!')
